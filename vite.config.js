@@ -1,27 +1,23 @@
-import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vite';
 
-export default {
-    plugins: [vue()],
+export default defineConfig({
     build: {
-        outDir: 'dist',
-        assetsDir: '',
-        cssCodeSplit: true,
+        outDir: 'public',
+        emptyOutDir: false,
         rollupOptions: {
-            input: {
-                app: 'resources/js/app.js',
-                styles: 'resources/js/styles.js',
-                'styles-dark': 'resources/js/styles-dark.js'
-            },
+            input: 'resources/js/vantage.js',
             output: {
-                entryFileNames: '[name].js',
-                chunkFileNames: '[name].[hash].js',
-                assetFileNames: '[name].[ext]',
+                entryFileNames: 'js/vantage.js',
+                assetFileNames: (assetInfo) => {
+                    if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+                        return 'css/vantage.css';
+                    }
+                    return 'assets/[name].[ext]';
+                },
             },
         },
     },
-    resolve: {
-        alias: {
-            '@': '/resources/js',
-        },
+    css: {
+        postcss: './postcss.config.js',
     },
-};
+});
