@@ -31,6 +31,12 @@ class VantageServiceProvider extends ServiceProvider
             __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'vantage-migrations');
 
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Console\Commands\PublishAssets::class,
+            ]);
+        }
+
         // Master switch: if package is disabled, don't register anything
         if (! config('vantage.enabled', true)) {
             return;
