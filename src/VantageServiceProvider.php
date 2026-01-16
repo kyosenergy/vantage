@@ -68,8 +68,10 @@ class VantageServiceProvider extends ServiceProvider
             return true;
         });
 
-        // Load our migrations automatically
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        // Load migrations from package if not published to app
+        if (! $this->migrationsPublished()) {
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        }
 
         // Load views
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'vantage');
@@ -83,5 +85,29 @@ class VantageServiceProvider extends ServiceProvider
         Event::listen(JobProcessing::class, [Listeners\RecordJobStart::class, 'handle']);
         Event::listen(JobProcessed::class, [Listeners\RecordJobSuccess::class, 'handle']);
         Event::listen(JobFailed::class, [Listeners\RecordJobFailure::class, 'handle']);
+    }
+
+    /**
+     * Check if migrations have been published to the application.
+     * We check for any vantage migration file pattern in the app's migrations folder.
+     */
+    protected function migrationsPublished(): bool
+    {
+        $migrationsPath = database_path('migrations');
+
+        if (! is_dir($migrationsPath)) {
+            return false;
+        }
+
+        // Look for any migration containing 'vantage' or 'queue_job_runs' in the filename
+        $files = scandir($migrationsPath);
+
+        foreach ($files as $file) {
+            if (str_contains($file, 'vantage') || str_contains($file, 'queue_job_runs')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
