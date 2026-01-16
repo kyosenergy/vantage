@@ -238,4 +238,86 @@ class Vantage
     {
         return config('vantage.enabled', true);
     }
+
+    /**
+     * Get inline CSS tags for the dashboard.
+     * Loads compiled CSS files and returns them as inline <style> tags.
+     */
+    public static function css(): string
+    {
+        $distPath = dirname(__DIR__, 1) . '/dist';
+        $cssFiles = [
+            'styles.css',
+            'app.css',
+        ];
+
+        $styles = [];
+        foreach ($cssFiles as $file) {
+            $filepath = $distPath . '/' . $file;
+            if (file_exists($filepath)) {
+                $content = file_get_contents($filepath);
+                if ($content !== false) {
+                    $styles[] = $content;
+                }
+            }
+        }
+
+        return '<style>' . implode("\n", $styles) . '</style>';
+    }
+
+    /**
+     * Get inline JavaScript for the dashboard.
+     * Loads compiled app.js and returns it as an inline <script> tag with Vantage configuration.
+     */
+    public static function js(): string
+    {
+        $distPath = dirname(__DIR__, 1) . '/dist';
+        $jsFile = $distPath . '/app.js';
+
+        if (! file_exists($jsFile)) {
+            return '<script>console.error("Vantage app.js not found")</script>';
+        }
+
+        $appJs = file_get_contents($jsFile);
+        if ($appJs === false) {
+            return '<script>console.error("Failed to load Vantage app.js")</script>';
+        }
+
+        // Get the base path for Vue Router
+        $basePath = route('vantage.dashboard') === url('/vantage') ? '/vantage' : '/vantage/';
+
+        // Provide configuration to the Vue app via window.Vantage
+        $config = json_encode([
+            'base_path' => rtrim($basePath, '/') . '/',
+            'csrf_token' => csrf_token(),
+            'api_prefix' => '/vantage/api',
+        ], JSON_UNESCAPED_SLASHES);
+
+        return "<script>
+window.Vantage = {$config};
+</script>
+<script>{$appJs}</script>";
+    }
+
+    /**
+     * Get dark theme CSS for the dashboard.
+     * Loads dark theme CSS and returns it as an inline <style> tag.
+     * Can be dynamically loaded/applied based on user theme preference.
+     */
+    public static function darkThemeCss(): string
+    {
+        $distPath = dirname(__DIR__, 1) . '/dist';
+        $filepath = $distPath . '/styles-dark.css';
+
+        if (! file_exists($filepath)) {
+            return '';
+        }
+
+        $content = file_get_contents($filepath);
+        if ($content === false) {
+            return '';
+        }
+
+        return '<style id="vantage-dark-theme">' . $content . '</style>';
+    }
 }
