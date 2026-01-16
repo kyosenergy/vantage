@@ -29,6 +29,39 @@ window.highlightJson = function(json) {
         .replace(/\b(-?\d+\.?\d*(?:[eE][+-]?\d+)?)\b/g, '<span class="json-number">$1</span>');
 };
 
+window.copyToClipboard = async function(text, buttonElement) {
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            // Fallback for older browsers or non-secure contexts
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        
+        if (buttonElement) {
+            const originalHTML = buttonElement.innerHTML;
+            buttonElement.innerHTML = '<i data-lucide="check" class="w-4 h-4" aria-hidden="true"></i> Copied!';
+            buttonElement.classList.add('text-green-600');
+            window.lucide.createIcons();
+            
+            setTimeout(() => {
+                buttonElement.innerHTML = originalHTML;
+                buttonElement.classList.remove('text-green-600');
+                window.lucide.createIcons();
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('Failed to copy to clipboard:', error);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     window.lucide.createIcons();
     
