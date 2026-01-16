@@ -3,7 +3,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
+        "build": "vite build && npm run build:css",
+        "build:css": "tailwindcss -i resources/css/vantage.css -o public/css/vantage.css --minify",
         "watch": "vite build --watch"
     },
     "dependencies": {
