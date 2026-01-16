@@ -5,7 +5,35 @@ namespace HoudaSlassi\Vantage\Models;
 use HoudaSlassi\Vantage\Database\Factories\VantageJobFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $uuid
+ * @property string $job_class
+ * @property string|null $queue
+ * @property string|null $connection
+ * @property int $attempt
+ * @property string $status
+ * @property Carbon|null $started_at
+ * @property Carbon|null $finished_at
+ * @property int|null $duration_ms
+ * @property string|null $exception_class
+ * @property string|null $exception_message
+ * @property string|null $stack
+ * @property array|null $job_tags
+ * @property array|null $payload
+ * @property int|null $retried_from_id
+ * @property int|null $memory_start_bytes
+ * @property int|null $memory_end_bytes
+ * @property int|null $memory_peak_start_bytes
+ * @property int|null $memory_peak_end_bytes
+ * @property int|null $memory_peak_delta_bytes
+ * @property int|null $cpu_user_ms
+ * @property int|null $cpu_sys_ms
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
 class VantageJob extends Model
 {
     use HasFactory;
@@ -66,14 +94,13 @@ class VantageJob extends Model
 
     /**
      * Get payload as decoded array
+     *
+     * @deprecated Payload is already cast to array, use $model->payload directly
      */
     public function getDecodedPayloadAttribute(): ?array
     {
-        if (! $this->payload) {
-            return null;
-        }
-
-        return json_decode($this->payload, true);
+        // payload is already cast to array in $casts, just return it
+        return $this->payload;
     }
 
     /**

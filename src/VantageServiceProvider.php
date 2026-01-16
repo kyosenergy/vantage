@@ -33,6 +33,7 @@ class VantageServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                Console\Commands\InstallCommand::class,
                 Console\Commands\PublishAssets::class,
             ]);
         }

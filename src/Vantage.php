@@ -15,7 +15,7 @@ class Vantage
      */
     public function queueDepth(?string $queue = null): Collection
     {
-        return app(QueueDepthChecker::class)->check($queue);
+        return collect(QueueDepthChecker::getQueueDepth($queue));
     }
 
     /**
@@ -58,6 +58,8 @@ class Vantage
 
     /**
      * Get statistics for the dashboard.
+     *
+     * @return array{total: int, processed: int, failed: int, processing: int, success_rate: float}
      */
     public function statistics(?string $startDate = null): array
     {
@@ -67,6 +69,7 @@ class Vantage
             $query->where('created_at', '>=', $startDate);
         }
 
+        /** @var object{total: int, processed: int, failed: int, processing: int} $stats */
         $stats = $query->select(
             DB::raw('COUNT(*) as total'),
             DB::raw('SUM(CASE WHEN status = "processed" THEN 1 ELSE 0 END) as processed'),
@@ -74,15 +77,20 @@ class Vantage
             DB::raw('SUM(CASE WHEN status = "processing" THEN 1 ELSE 0 END) as processing')
         )->first();
 
-        $successRate = $stats->total > 0
-            ? round(($stats->processed / ($stats->processed + $stats->failed)) * 100, 2)
-            : 0;
+        $total = (int) ($stats->total ?? 0);
+        $processed = (int) ($stats->processed ?? 0);
+        $failed = (int) ($stats->failed ?? 0);
+        $processing = (int) ($stats->processing ?? 0);
+
+        $successRate = $total > 0
+            ? round(($processed / ($processed + $failed)) * 100, 2)
+            : 0.0;
 
         return [
-            'total' => $stats->total ?? 0,
-            'processed' => $stats->processed ?? 0,
-            'failed' => $stats->failed ?? 0,
-            'processing' => $stats->processing ?? 0,
+            'total' => $total,
+            'processed' => $processed,
+            'failed' => $failed,
+            'processing' => $processing,
             'success_rate' => $successRate,
         ];
     }

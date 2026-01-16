@@ -13,11 +13,6 @@ class PublishAssets extends Command
     public function handle(): int
     {
         $this->call('vendor:publish', [
-            '--tag' => 'vantage-config',
-            '--force' => true,
-        ]);
-
-        $this->call('vendor:publish', [
             '--tag' => 'vantage-assets',
             '--force' => true,
         ]);
