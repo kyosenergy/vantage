@@ -27,11 +27,12 @@ class VantageServiceProvider extends ServiceProvider
             __DIR__.'/../public' => public_path('vendor/vantage'),
         ], 'vantage-assets');
 
-        $this->publishes([
-            __DIR__.'/../database/migrations' => database_path('migrations'),
-        ], 'vantage-migrations');
-
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'vantage-migrations');
+
             $this->commands([
                 Console\Commands\InstallCommand::class,
                 Console\Commands\PublishAssets::class,

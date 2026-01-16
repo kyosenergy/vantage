@@ -22,11 +22,6 @@ class InstallCommand extends Command
             '--force' => true,
         ]);
 
-        $this->call('vendor:publish', [
-            '--tag' => 'vantage-migrations',
-            '--force' => true,
-        ]);
-
         $this->info('Vantage assets installed successfully.');
 
         return self::SUCCESS;
