@@ -9,6 +9,7 @@ use HoudaSlassi\Vantage\Support\TagExtractor;
 use HoudaSlassi\Vantage\Support\Traits\ExtractsRetryOf;
 use HoudaSlassi\Vantage\Support\VantageLogger;
 use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Str;
 
 class RecordJobSuccess
 {
