@@ -95,12 +95,32 @@ class VantageJob extends Model
     /**
      * Get payload as decoded array
      *
-     * @deprecated Payload is already cast to array, use $model->payload directly
+     * Handles edge cases where the payload might be a string (JSON) or malformed data.
+     * This accessor is kept for backwards compatibility with views that use $job->decoded_payload.
      */
     public function getDecodedPayloadAttribute(): ?array
     {
-        // payload is already cast to array in $casts, just return it
-        return $this->payload;
+        $payload = $this->payload;
+
+        // Already null
+        if ($payload === null) {
+            return null;
+        }
+
+        // Already an array (normal case via 'array' cast)
+        if (is_array($payload)) {
+            return $payload;
+        }
+
+        // String - try to decode as JSON (edge case: cast failed or legacy data)
+        if (is_string($payload)) {
+            $decoded = json_decode($payload, true);
+
+            return is_array($decoded) ? $decoded : null;
+        }
+
+        // Unexpected type - return null
+        return null;
     }
 
     /**
