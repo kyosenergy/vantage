@@ -59,6 +59,21 @@
                 </div>
             </div>
 
+            <!-- Date range filters -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+                    <input type="datetime-local" name="start_date" value="{{ request('start_date') }}" 
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">End Date</label>
+                    <input type="datetime-local" name="end_date" value="{{ request('end_date') }}" 
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                </div>
+            </div>
+
             <!-- Tags section -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">Tags</label>

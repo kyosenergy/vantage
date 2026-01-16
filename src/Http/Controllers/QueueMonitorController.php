@@ -320,6 +320,15 @@ class QueueMonitorController extends Controller
             $query->where('created_at', '>', $request->since);
         }
 
+        // Date range filters
+        if ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date);
+        }
+
         // Get jobs
         $jobs = $query->latest('id')
             ->paginate(50)
