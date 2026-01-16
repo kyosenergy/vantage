@@ -156,7 +156,7 @@
                     <i data-lucide="package" class="w-5 h-5 text-gray-500" aria-hidden="true"></i>
                     Payload
                 </h3>
-                <pre class="text-xs bg-gray-50 p-4 rounded overflow-x-auto"><code>{{ json_encode($job->decoded_payload, JSON_PRETTY_PRINT) }}</code></pre>
+                <pre class="json-highlight"><code data-json-highlight>{{ json_encode($job->decoded_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) }}</code></pre>
             </div>
         @endif
 
