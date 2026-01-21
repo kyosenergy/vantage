@@ -20,7 +20,7 @@ class QueueMonitorController extends Controller
      */
     public function index(Request $request)
     {
-        $period = $request->query('period', '30d'); // Changed default to 30 days
+        $period = $request->query('period', '1h');
         $since = $this->getSinceDate($period);
 
         // Overall statistics
