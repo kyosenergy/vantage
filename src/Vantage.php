@@ -15,7 +15,7 @@ class Vantage
      */
     public function queueDepth(?string $queue = null): Collection
     {
-        return app(QueueDepthChecker::class)->check($queue);
+        return collect(QueueDepthChecker::getQueueDepth($queue));
     }
 
     /**
@@ -58,6 +58,8 @@ class Vantage
 
     /**
      * Get statistics for the dashboard.
+     *
+     * @return array{total: int, processed: int, failed: int, processing: int, success_rate: float}
      */
     public function statistics(?string $startDate = null): array
     {
@@ -67,6 +69,7 @@ class Vantage
             $query->where('created_at', '>=', $startDate);
         }
 
+        /** @var object{total: int, processed: int, failed: int, processing: int} $stats */
         $stats = $query->select(
             DB::raw('COUNT(*) as total'),
             DB::raw('SUM(CASE WHEN status = "processed" THEN 1 ELSE 0 END) as processed'),
@@ -74,15 +77,20 @@ class Vantage
             DB::raw('SUM(CASE WHEN status = "processing" THEN 1 ELSE 0 END) as processing')
         )->first();
 
-        $successRate = $stats->total > 0
-            ? round(($stats->processed / ($stats->processed + $stats->failed)) * 100, 2)
-            : 0;
+        $total = (int) ($stats->total ?? 0);
+        $processed = (int) ($stats->processed ?? 0);
+        $failed = (int) ($stats->failed ?? 0);
+        $processing = (int) ($stats->processing ?? 0);
+
+        $successRate = $total > 0
+            ? round(($processed / ($processed + $failed)) * 100, 2)
+            : 0.0;
 
         return [
-            'total' => $stats->total ?? 0,
-            'processed' => $stats->processed ?? 0,
-            'failed' => $stats->failed ?? 0,
-            'processing' => $stats->processing ?? 0,
+            'total' => $total,
+            'processed' => $processed,
+            'failed' => $failed,
+            'processing' => $processing,
             'success_rate' => $successRate,
         ];
     }
@@ -237,5 +245,95 @@ class Vantage
     public function enabled(): bool
     {
         return config('vantage.enabled', true);
+    }
+
+    /**
+     * Get inline CSS tags for the dashboard.
+     * Loads compiled Tailwind CSS as inline styles.
+     */
+    public static function css(): string
+    {
+        // Load from public/css/vantage.css (bundled Tailwind CSS)
+        $publicPath = dirname(__DIR__, 1).'/public/css';
+        $cssFile = $publicPath.'/vantage.css';
+
+        if (file_exists($cssFile)) {
+            $content = file_get_contents($cssFile);
+            if ($content !== false) {
+                return '<style>'.$content.'</style>';
+            }
+        }
+
+        // Fallback to dist/ CSS if public/ not available
+        $distPath = dirname(__DIR__, 1).'/dist';
+        $cssFiles = [
+            'styles.css',
+            'app.css',
+        ];
+
+        $styles = [];
+        foreach ($cssFiles as $file) {
+            $filepath = $distPath.'/'.$file;
+            if (file_exists($filepath)) {
+                $content = file_get_contents($filepath);
+                if ($content !== false) {
+                    $styles[] = $content;
+                }
+            }
+        }
+
+        return '<style>'.implode("\n", $styles).'</style>';
+    }
+
+    /**
+     * Get inline JavaScript for the dashboard.
+     * Loads Lucide icons and Chart.js for the Blade templates.
+     */
+    public static function js(): string
+    {
+        // Load from public/js/vantage.js (bundled Lucide + Chart.js)
+        $publicPath = dirname(__DIR__, 1).'/public/js';
+        $jsFile = $publicPath.'/vantage.js';
+
+        if (! file_exists($jsFile)) {
+            return '<script>console.error("Vantage JS not found")</script>';
+        }
+
+        $js = file_get_contents($jsFile);
+        if ($js === false) {
+            return '<script>console.error("Failed to load Vantage JS")</script>';
+        }
+
+        // Initialize Lucide icons after DOM is loaded
+        return "<script>{$js}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+});
+</script>";
+    }
+
+    /**
+     * Get dark theme CSS for the dashboard.
+     * Loads dark theme CSS and returns it as an inline <style> tag.
+     * Can be dynamically loaded/applied based on user theme preference.
+     */
+    public static function darkThemeCss(): string
+    {
+        $distPath = dirname(__DIR__, 1).'/dist';
+        $filepath = $distPath.'/styles-dark.css';
+
+        if (! file_exists($filepath)) {
+            return '';
+        }
+
+        $content = file_get_contents($filepath);
+        if ($content === false) {
+            return '';
+        }
+
+        return '<style id="vantage-dark-theme">'.$content.'</style>';
     }
 }

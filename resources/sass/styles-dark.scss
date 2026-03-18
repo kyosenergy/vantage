@@ -1,0 +1,44 @@
+@import 'colors';
+
+// Dark theme - full standalone Bootstrap compile
+$primary: #6366f1;
+$secondary: $gray-500;
+$success: $emerald-500;
+$info: $blue-500;
+$warning: $amber-500;
+$danger: $red-500;
+
+// Dark theme overrides
+$body-bg: $gray-900;
+$body-color: $gray-100;
+$text-muted: $gray-400;
+
+$border-color: $gray-700;
+$table-border-color: $gray-700;
+$table-hover-bg: $gray-800;
+
+$header-border-color: $gray-700;
+
+$input-bg: $gray-800;
+$input-color: $gray-100;
+$input-border-color: $gray-700;
+
+$card-cap-bg: $gray-800;
+$card-bg-secondary: $gray-800;
+$card-bg: $gray-800;
+
+$code-bg: #1a1a2e;
+
+$new-entries-bg: $violet-50;
+
+$dropdown-bg: $gray-800;
+$dropdown-link-color: $gray-300;
+
+$btn-muted-color: $gray-400;
+$btn-muted-bg: $gray-700;
+$btn-muted-hover-color: $gray-100;
+$btn-muted-hover-bg: $gray-600;
+$btn-muted-active-color: $white;
+$btn-muted-active-bg: $primary;
+
+@import 'bootstrap';

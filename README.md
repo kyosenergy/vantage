@@ -14,15 +14,15 @@ and provides a simple web interface to view everything.
 
 ```bash
 composer require houdaslassi/vantage
-php artisan vendor:publish --tag=vantage-config
+php artisan vantage:install
 php artisan migrate
 ```
 
-The package will automatically register itself using
+The package will automatically register itself using:
 
 **Publishing Assets:**
+- Assets: `php artisan vendor:publish --tag=vantage-assets`
 - Config: `php artisan vendor:publish --tag=vantage-config`
-- Views: `php artisan vendor:publish --tag=vantage-views` (optional, for customization)
 - Migrations: Automatically loaded, but you can publish with `php artisan vendor:publish --tag=vantage-migrations` if needed
 
 ### Requirements

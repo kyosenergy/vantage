@@ -5,7 +5,35 @@ namespace HoudaSlassi\Vantage\Models;
 use HoudaSlassi\Vantage\Database\Factories\VantageJobFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $uuid
+ * @property string $job_class
+ * @property string|null $queue
+ * @property string|null $connection
+ * @property int $attempt
+ * @property string $status
+ * @property Carbon|null $started_at
+ * @property Carbon|null $finished_at
+ * @property int|null $duration_ms
+ * @property string|null $exception_class
+ * @property string|null $exception_message
+ * @property string|null $stack
+ * @property array|null $job_tags
+ * @property array|null $payload
+ * @property int|null $retried_from_id
+ * @property int|null $memory_start_bytes
+ * @property int|null $memory_end_bytes
+ * @property int|null $memory_peak_start_bytes
+ * @property int|null $memory_peak_end_bytes
+ * @property int|null $memory_peak_delta_bytes
+ * @property int|null $cpu_user_ms
+ * @property int|null $cpu_sys_ms
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
 class VantageJob extends Model
 {
     use HasFactory;
@@ -66,14 +94,33 @@ class VantageJob extends Model
 
     /**
      * Get payload as decoded array
+     *
+     * Handles edge cases where the payload might be a string (JSON) or malformed data.
+     * This accessor is kept for backwards compatibility with views that use $job->decoded_payload.
      */
     public function getDecodedPayloadAttribute(): ?array
     {
-        if (! $this->payload) {
+        $payload = $this->payload;
+
+        // Already null
+        if ($payload === null) {
             return null;
         }
 
-        return json_decode($this->payload, true);
+        // Already an array (normal case via 'array' cast)
+        if (is_array($payload)) {
+            return $payload;
+        }
+
+        // String - try to decode as JSON (edge case: cast failed or legacy data)
+        if (is_string($payload)) {
+            $decoded = json_decode($payload, true);
+
+            return is_array($decoded) ? $decoded : null;
+        }
+
+        // Unexpected type - return null
+        return null;
     }
 
     /**

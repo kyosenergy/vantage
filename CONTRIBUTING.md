@@ -64,4 +64,47 @@ composer analyse
 composer format
 ```
 
+## Building Frontend Assets
+
+The dashboard is built with Vue 3 and Bootstrap 5, and uses Vite for bundling. When you make changes to Vue components or SASS files, you need to rebuild the assets.
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Build Assets (Production)
+
+```bash
+npm run build
+```
+
+This will compile all Vue components and SASS files to the `dist/` directory. The compiled assets are embedded as inline JavaScript and CSS in the Blade view, following the same approach as Laravel Horizon.
+
+### Development Mode (Watch for Changes)
+
+```bash
+npm run watch
+```
+
+This will automatically rebuild assets when you make changes to files in `resources/`.
+
+### Important Notes
+
+- Always run `npm run build` before committing changes to Vue components or SASS files
+- The `dist/` directory should be committed to the repository (it's used by package consumers)
+- Contributors do NOT need to rebuild unless they modify `resources/js/` or `resources/sass/` files
+- If you encounter build errors, try running `npm install` to ensure all dependencies are installed
+
+## Project Structure
+
+- `resources/js/app.js` - Vue 3 application entry point
+- `resources/js/screens/` - Page components (Dashboard, Jobs, etc.)
+- `resources/js/routes.js` - Vue Router configuration
+- `resources/sass/` - SASS stylesheets (light and dark themes)
+- `dist/` - Compiled assets (committed to repo)
+- `vite.config.js` - Vite build configuration
+
 **Happy coding**!
+

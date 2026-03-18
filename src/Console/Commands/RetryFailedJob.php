@@ -73,15 +73,13 @@ class RetryFailedJob extends Command
         }
 
         try {
-            $payload = json_decode($run->payload, true);
-
-            if (! $payload) {
+            if (! is_array($run->payload)) {
                 return null;
             }
 
             $jobClass = $run->job_class;
 
-            return $this->recreateJobWithReflection($jobClass, $payload);
+            return $this->recreateJobWithReflection($jobClass, $run->payload);
         } catch (\Throwable $e) {
             $this->error('Failed to restore job from payload: '.$e->getMessage());
 

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vantage - @yield('title')</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Vantage - @yield('title', 'Queue Monitoring')</title>
+    {!! \HoudaSlassi\Vantage\Vantage::css() !!}
     <style>
         [x-cloak] { display: none !important; }
     </style>
@@ -17,7 +18,7 @@
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
                         <a href="{{ route('vantage.dashboard') }}" class="text-xl font-bold text-gray-900 hover:text-indigo-600 transition-colors inline-flex items-center gap-2">
-                            <i data-lucide="target" class="w-6 h-6 text-indigo-600" aria-hidden="true"></i>
+                            <i data-lucide="target" class="w-6 h-6 text-red-500" aria-hidden="true"></i>
                             Vantage
                         </a>
                     </div>
@@ -60,14 +61,7 @@
 
         @yield('content')
     </main>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        });
-    </script>
+
+    {!! \HoudaSlassi\Vantage\Vantage::js() !!}
 </body>
 </html>
-

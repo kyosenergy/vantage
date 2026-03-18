@@ -1,6 +1,3 @@
-includes:
-    - phpstan-baseline.neon
-
 parameters:
     level: 5
     paths:
@@ -10,4 +7,26 @@ parameters:
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - '#Called ''env'' outside of the config directory#'
+        - '#Call to an undefined method Illuminate\\Database\\Schema\\ColumnDefinition::references#'
+        # SlackMessage is from optional laravel/slack-notification-channel package
+        - '#class Illuminate\\Notifications\\Messages\\SlackMessage#'
+        - '#has invalid return type Illuminate\\Notifications\\Messages\\SlackMessage#'
+        # setAccessible() is deprecated in PHP 8.1+ but harmless - may not match on all PHP versions
+        -
+            message: '#Call to deprecated method setAccessible\(\) of class Reflection(Property|Method)#'
+            reportUnmatched: false
+        - '#Negated boolean expression is always true#'
+        - '#Property .* on left side of \?\? is not nullable#'
+        - '#Call to function is_string\(\) with class-string will always evaluate to true#'
+        # Defensive ternary patterns for memory functions - @error suppression makes PHPStan
+        # think the condition is always true, but we keep ?: null as defensive code
+        - '#Ternary operator condition is always true#'
+        # Larastan 3.x is stricter about view-string type - our view names are valid package views
+        # Only triggers in certain PHP/Laravel version combinations in CI
+        -
+            message: '#Parameter \#1 \$view of function view expects view-string\|null, string given#'
+            reportUnmatched: false
 

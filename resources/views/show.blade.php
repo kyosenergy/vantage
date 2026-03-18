@@ -151,12 +151,26 @@
 
         <!-- Payload -->
         @if($job->payload)
+            @php
+                $payloadJson = json_encode($job->decoded_payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            @endphp
             <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4 inline-flex items-center gap-2">
-                    <i data-lucide="package" class="w-5 h-5 text-gray-500" aria-hidden="true"></i>
-                    Payload
-                </h3>
-                <pre class="text-xs bg-gray-50 p-4 rounded overflow-x-auto"><code>{{ json_encode($job->decoded_payload, JSON_PRETTY_PRINT) }}</code></pre>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900 inline-flex items-center gap-2">
+                        <i data-lucide="package" class="w-5 h-5 text-gray-500" aria-hidden="true"></i>
+                        Payload
+                    </h3>
+                    <button 
+                        type="button"
+                        onclick="copyToClipboard(document.getElementById('payload-content').dataset.payload, this)"
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                        aria-label="Copy payload to clipboard"
+                    >
+                        <i data-lucide="clipboard-copy" class="w-4 h-4" aria-hidden="true"></i>
+                        Copy
+                    </button>
+                </div>
+                <pre id="payload-content" class="json-highlight" data-payload="{{ $payloadJson }}"><code data-json-highlight>{{ $payloadJson }}</code></pre>
             </div>
         @endif
 

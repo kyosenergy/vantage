@@ -20,7 +20,7 @@ class QueueMonitorController extends Controller
      */
     public function index(Request $request)
     {
-        $period = $request->get('period', '30d'); // Changed default to 30 days
+        $period = $request->query('period', '1h');
         $since = $this->getSinceDate($period);
 
         // Overall statistics
@@ -250,7 +250,7 @@ class QueueMonitorController extends Controller
         }
 
         // Advanced tag filtering
-        $tagsParam = $request->get('tags');
+        $tagsParam = $request->query('tags');
 
         // Check if tags parameter exists and is not empty
         if (! empty($tagsParam) && trim($tagsParam) !== '') {
@@ -272,7 +272,7 @@ class QueueMonitorController extends Controller
                             if ($driver === 'sqlite') {
                                 // SQLite: json_each().value returns the actual string, not JSON-encoded
                                 $q->orWhereRaw('EXISTS (
-                                    SELECT 1 FROM json_each(vantage_jobs.job_tags) 
+                                    SELECT 1 FROM json_each(vantage_jobs.job_tags)
                                     WHERE json_each.value = ?
                                 )', [$tag]);
                             } else {
@@ -288,7 +288,7 @@ class QueueMonitorController extends Controller
                             // SQLite: json_each().value returns the actual string, not JSON-encoded
                             // So we compare directly to the tag value
                             $query->whereRaw('EXISTS (
-                                SELECT 1 FROM json_each(vantage_jobs.job_tags) 
+                                SELECT 1 FROM json_each(vantage_jobs.job_tags)
                                 WHERE json_each.value = ?
                             )', [$tag]);
                         } else {
@@ -308,7 +308,7 @@ class QueueMonitorController extends Controller
             if ($driver === 'sqlite') {
                 // SQLite: json_each().value returns the actual string, not JSON-encoded
                 $query->whereRaw('EXISTS (
-                    SELECT 1 FROM json_each(vantage_jobs.job_tags) 
+                    SELECT 1 FROM json_each(vantage_jobs.job_tags)
                     WHERE json_each.value = ?
                 )', [$tag]);
             } else {
@@ -318,6 +318,15 @@ class QueueMonitorController extends Controller
 
         if ($request->filled('since')) {
             $query->where('created_at', '>', $request->since);
+        }
+
+        // Date range filters
+        if ($request->filled('start_date')) {
+            $query->where('created_at', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->where('created_at', '<=', $request->end_date);
         }
 
         // Get jobs
@@ -367,7 +376,7 @@ class QueueMonitorController extends Controller
      */
     public function tags(Request $request)
     {
-        $period = $request->get('period', '7d');
+        $period = $request->query('period', '7d');
         $since = $this->getSinceDate($period);
 
         // Use optimized database-native queries for large datasets
